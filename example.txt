@@ -1,0 +1,10 @@
+// This is a comment with 'string'
+let str1 = 'Single Quoted String p2'; /* Another Comment with "string" */
+let str2 = "p2 Double w0 Quoted String h-100 ";
+let str3 = `Template String`;
+
+/*
+  let str4 = 'not included'
+*/
+
+# This string should not be part of the ouput "No Sir!"
