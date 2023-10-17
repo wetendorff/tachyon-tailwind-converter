@@ -3,7 +3,9 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "start": "bun index.js"
+    "start": "bun index.ts parse",
+    "reset": "bun index.ts reset",
+    "backup": "bun index.ts backup"
   },
   "devDependencies": {
     "bun-types": "latest"
