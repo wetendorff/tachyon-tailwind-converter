@@ -2,13 +2,31 @@ import config from './config'
 import db from './src/db'
 import { saveMappingAsJson } from './src/mapping'
 import { findAllUsedTachyonClasses, parseTachyonCSSFile } from './src/parse'
+import readline from 'readline'
 
 type Command = 'reset' | 'backup' | 'parse'
 
+async function question(question: string, callback: (answer: string) => void) {
+  process.stdout.write(question)
+  for await (const answer of console) {
+    callback(answer)
+    break
+  }
+}
+
 let commands: Record<Command, () => void | Promise<void>> = {
-  reset() {
-    console.log('Reset Database')
-    db.reset()
+  async reset() {
+    await question(
+      'Are you sure you want to reset the database? (y/N)? ',
+      (answer) => {
+        if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+          console.log('Reset Database...')
+          db.reset()
+        } else {
+          console.log('Aborted')
+        }
+      },
+    )
   },
 
   backup() {
@@ -28,9 +46,9 @@ let commands: Record<Command, () => void | Promise<void>> = {
 
 const command = process.argv[2] as Command
 if (commands[command]) {
-  console.time()
+  console.time('time')
   await commands[command]()
-  console.timeEnd()
+  console.timeEnd('time')
   console.log('Done!')
 } else {
   console.log(
