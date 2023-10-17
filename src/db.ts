@@ -16,7 +16,6 @@ class TachyonTailwindDatabase {
   constructor() {
     this.db = new Database('tt.sqlite')
     this.init()
-    console.log('Database initialized')
   }
 
   // Get All Tachyon
@@ -151,7 +150,6 @@ class TachyonTailwindDatabase {
 
   // Reset Database
   reset() {
-    console.log('Reset Database')
     this.db.run(/*sql*/ `DROP TABLE IF EXISTS tachyons;`)
     this.db.run(/*sql*/ `DROP TABLE IF EXISTS files;`)
     this.db.run(/*sql*/ `DROP TABLE IF EXISTS tachyons_files;`)

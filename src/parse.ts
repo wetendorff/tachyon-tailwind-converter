@@ -30,7 +30,6 @@ export function findAllUsedTachyonClasses() {
 }
 
 async function fileCallback(file: string) {
-  console.log('Found file:', file)
   const text = await Bun.file(file).text()
 
   // Filter out all strings that are not containing a Tachyon class
@@ -47,22 +46,9 @@ async function fileCallback(file: string) {
           file,
         )
       }
-      // console.log(
-      //   'Found Tachyon classes in :',
-      //   file,
-      //   'String:',
-      //   str,
-      //   tachyonClasses.length === 1 ? 'WARNING!' : '',
-      // )
       return true
     }
   })
-
-  // if (filteredString.length)
-  //   console.log('Found strings containing tachyon classes in file:', file)
-  // filteredString.forEach((str) => {
-  //   console.log(`Found string with tachyon classes: "${str}"`)
-  // })
 
   // Mark all found tachyon classes as used and connect it with the current file
   filteredString.forEach((str) => {
