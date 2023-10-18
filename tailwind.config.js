@@ -44,6 +44,9 @@ export default {
       boxShadow: {
         'shadow-2': '0 0 8px 2px rgba( 0, 0, 0, .2 )',
       },
+      transitionProperty: {
+        color: 'color',
+      },
     },
   },
   plugins: [],
