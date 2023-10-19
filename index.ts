@@ -1,37 +1,41 @@
 import config from './config'
-import db from './src/db'
-import { saveMappingAsJson } from './src/mapping'
-import { findAllUsedTachyonClasses, parseTachyonCSSFile } from './src/parse'
-import readline from 'readline'
+import db from './src/database'
+import { backupToFile, restoreFromFile } from './src/backup'
+import {
+  findAllUsedTachyonClasses,
+  parseTachyonCSSFile,
+  parseTextForStrings,
+  replaceTachyonClasses,
+} from './src/parse'
+import { question } from './src/strings'
 
-type Command = 'reset' | 'backup' | 'parse'
-
-async function question(question: string, callback: (answer: string) => void) {
-  process.stdout.write(question)
-  for await (const answer of console) {
-    callback(answer)
-    break
-  }
-}
+type Command = 'reset' | 'backup' | 'restore' | 'parse' | 'replace' | 'debug'
 
 let commands: Record<Command, () => void | Promise<void>> = {
+  /**
+   * Resets the database after prompting the user for confirmation.
+   */
   async reset() {
-    await question(
-      'Are you sure you want to reset the database? (y/N)? ',
-      (answer) => {
-        if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-          console.log('Reset Database...')
-          db.reset()
-        } else {
-          console.log('Aborted')
-        }
-      },
+    const reset = question(
+      'Are you sure you want to reset the database? (y/N)?',
     )
+    if (!reset) {
+      console.log('Aborted')
+      return
+    }
+
+    console.log('Reset Database...')
+    db.reset()
   },
 
   backup() {
-    console.log('Backup mapping to mapping.json')
-    saveMappingAsJson()
+    console.log(`Backup mapping to: ${config.backupFile}`)
+    backupToFile(config.backupFile)
+  },
+
+  async restore() {
+    console.log(`Restore mapping from: ${config.backupFile}`)
+    await restoreFromFile(config.backupFile)
   },
 
   async parse() {
@@ -40,7 +44,28 @@ let commands: Record<Command, () => void | Promise<void>> = {
     )
     db.init()
     await parseTachyonCSSFile(config.tachyonFile)
-    findAllUsedTachyonClasses()
+    await findAllUsedTachyonClasses()
+  },
+
+  async replace(): Promise<void> {
+    console.log('Replace Tachyon classes with Tailwind classes')
+    const notMapped = db.getNotMappedTailwindClasses()
+    if (notMapped.length > 0) {
+      console.log('Not mapped Tailwind classes:')
+      console.log(notMapped)
+      console.log('Aborted')
+      return
+    }
+    await replaceTachyonClasses()
+  },
+
+  debug() {
+    console.log(
+      'result',
+      parseTextForStrings(
+        'This is a test string with some duplicate "strings" and `backtick strings` and "strings"',
+      ),
+    )
   },
 }
 
@@ -55,5 +80,3 @@ if (commands[command]) {
     `The command '${command}' does not exist. Available commands: reset, backup, show`,
   )
 }
-
-// TODO If all tailwind mappings has been made, then go through all files containing Tachyon classes and replace them with Tailwind classes

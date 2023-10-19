@@ -176,4 +176,4 @@ dist
 
 mapping.json
 tt.sqlite
-mapping-backup.json
+mapping-backup*.json

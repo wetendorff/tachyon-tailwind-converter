@@ -1,67 +1,100 @@
-// export function getStrings(text: string) {
-//   // Remove all single-line comments
-//   text = text.replace(/^(\/\/|#).*$/gm, "");
+export const findStringsRegEx = /`([^`]*)`|"([^"]*)"|'([^']*)'/gm
+export const singleLineCommentsRegEx = /^(\/\/|#)\s*\S.*$/gm
+export const multiLineCommentsRegEx =
+  /(\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\/)|(@\*[^*@]*\*@)|(<!--[\s\S]*?-->)/gm
+export const newLineRegEx = /\r?\n|\r/g
+export const tachyonClassRegEx = /\.([a-zA-Z0-9_-]+)\s*\{([^}]*)\}/g // Regex match: ".[tachyonClassName] { [tachyonClassDefinition] }"
 
-//   // Remove all multi-line comments
-//   text = text.replace(/\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\//gm, "");
-
-//   // Get all strings
-//   const regex = /`([^`]*)`|"([^"]*)"|'([^']*)'/gm;
-//   const foundStrings = [];
-
-//   let match;
-//   while ((match = regex.exec(text))) {
-//     for (let i = 1; i < match.length; i++) {
-//       if (match[i]) {
-//         foundStrings.push(match[i]);
-//       }
-//     }
-//   }
-
-//   return foundStrings;
-// }
-
-// export function findMatchingWords(inputString: string, wordMap: any) {
-//   const result = new Map();
-//   inputString.split(" ").forEach((word) => {
-//     if (!wordMap.has(word)) {
-//       return;
-//     }
-
-//     if (!result.has(word)) {
-//       result.set(word, 1);
-//       return;
-//     }
-
-//     const count = result.get(word);
-//     result.set(word, count + 1);
-//   });
-//   return result;
-// }
-
-// export function parseText(text: string, wordMap: any) {
-//   // Get all strings in the text
-//   const strings = getStrings(text);
-
-//   // Search strings for words on positive list and add found words to result
-//   let result = new Map();
-//   strings.forEach((str) => {
-//     const resultMap = findMatchingWords(str, wordMap);
-
-//     resultMap.forEach((count, word) => {
-//       if (!result.has(word)) {
-//         result.set(word, count);
-//         return;
-//       }
-
-//       const currentCount = result.get(word);
-//       result.set(word, currentCount + count);
-//     });
-//   });
-
-//   return result;
-// }
+const encodedStringSymbols = ['°', '∑', 'ª']
+const decodedStringSymbols = ['"', "'", '`']
 
 export function removeNewLines(str: string) {
-  return str.replace(/\r?\n|\r/g, ' ');  
+  return str.replace(newLineRegEx, ' ')
+}
+
+function replaceCommentSymbols(
+  comment: string,
+  oldChars: string[],
+  newChars: string[],
+): string {
+  oldChars.forEach((oldChar, index) => {
+    comment = comment.replace(new RegExp('\\' + oldChar, 'g'), newChars[index])
+  })
+  return comment
+}
+
+export function encodeStringSymbolsInComments(text: string) {
+  text = text.replace(singleLineCommentsRegEx, (match) => {
+    const newString = replaceCommentSymbols(
+      match,
+      decodedStringSymbols,
+      encodedStringSymbols,
+    )
+    return newString
+  })
+
+  text = text.replace(multiLineCommentsRegEx, (match) => {
+    const newString = replaceCommentSymbols(
+      match,
+      decodedStringSymbols,
+      encodedStringSymbols,
+    )
+    return newString
+  })
+  return text
+}
+
+export function decodeStringSymbolsInComments(text: string) {
+  text = text.replace(singleLineCommentsRegEx, (match) => {
+    const newString = replaceCommentSymbols(
+      match,
+      encodedStringSymbols,
+      decodedStringSymbols,
+    )
+    return newString
+  })
+
+  text = text.replace(multiLineCommentsRegEx, (match) => {
+    const newString = replaceCommentSymbols(
+      match,
+      encodedStringSymbols,
+      decodedStringSymbols,
+    )
+    return newString
+  })
+  return text
+}
+
+// export function question(query: string) {
+//   const rl = readline.createInterface({
+//     input: process.stdin,
+//     output: process.stdout,
+//   })
+
+//   return new Promise((resolve) =>
+//     rl.question(query, (ans) => {
+//       rl.close()
+//       const answer = ans.toLowerCase()
+//       if (answer === 'y' || answer === 'yes') {
+//         resolve(true)
+//       } else if (answer === 'n' || answer === 'no') {
+//         resolve(false)
+//       } else {
+//         console.log('Invalid input, please enter either "y" or "n".')
+//         return resolve(question(query))
+//       }
+//     }),
+//   )
+// }
+
+export async function question(question: string) {
+  console.log(`Let's add some numbers!`)
+  console.write(`Count: 0\n> `)
+
+  let count = 0
+  for await (const line of console) {
+    count += Number(line)
+    console.write(`Count: ${count}\n> `)
+  }
+  return true
 }
