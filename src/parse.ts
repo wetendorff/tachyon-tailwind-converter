@@ -1,12 +1,14 @@
 import config from '../config'
 import db from './database'
+import { parseText } from './fileParser'
 import {
+  cStyleCommentsRegEx,
   decodeStringSymbolsInComments,
   encodeStringSymbolsInComments,
   findStringsRegEx,
-  multiLineCommentsRegEx,
+  htmlStyleCommentsRegEx,
+  razorStyleCommentsRegEx,
   removeNewLines,
-  singleLineCommentsRegEx,
   tachyonClassRegEx,
 } from './strings'
 import { traverseDirectory } from './traverseDir'
@@ -38,8 +40,9 @@ export async function findAllUsedTachyonClasses() {
 
 export async function fileCallback(file: string) {
   let text = await Bun.file(file).text()
-  text = text.replace(singleLineCommentsRegEx, '')
-  text = text.replace(multiLineCommentsRegEx, '')
+  text = text.replace(cStyleCommentsRegEx, '')
+  text = text.replace(htmlStyleCommentsRegEx, '')
+  text = text.replace(razorStyleCommentsRegEx, '')
 
   const strings = parseTextForStrings(text)
   const tachyonClasses = new Set<string>()
@@ -113,15 +116,20 @@ export async function replaceTachyonClasses() {
   const files = db.getFilesContainingTachyonClasses()
   for (const file of files) {
     console.log('file: ' + file)
+
     const text = await Bun.file(file).text()
+
     let safeText = encodeStringSymbolsInComments(text)
+
     safeText = safeText.replace(findStringsRegEx, (match) => {
       const stringDelimiter = match[0]
       const string = match.substring(1, match.length - 1)
       const newString = replaceTachyonClassesWithTailwindClassesInString(string)
       return `${stringDelimiter}${newString}${stringDelimiter}`
     })
+
     const finalText = decodeStringSymbolsInComments(safeText)
+
     await Bun.write(file + '.new', finalText)
   }
 }
@@ -165,4 +173,10 @@ export function replaceTachyonClassesWithTailwindClassesInString(
   }
 
   return mappedString
+}
+
+export function testParser(text: string) {
+  const { strings, comments } = parseText(text)
+  console.log('strings', strings)
+  console.log('comments', comments)
 }

@@ -7,6 +7,7 @@
     "replace": "bun index.ts replace",
     "reset": "bun index.ts reset",
     "backup": "bun index.ts backup",
+    "restore": "bun index.ts restore",
     "debug": "bun index.ts debug"
   },
   "devDependencies": {

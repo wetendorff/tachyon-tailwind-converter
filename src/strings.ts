@@ -1,7 +1,10 @@
 export const findStringsRegEx = /`([^`]*)`|"([^"]*)"|'([^']*)'/gm
-export const singleLineCommentsRegEx = /^(\/\/|#)\s*\S.*$/gm
-export const multiLineCommentsRegEx =
-  /(\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\/)|(@\*[^*@]*\*@)|(<!--[\s\S]*?-->)/gm
+
+export const cStyleCommentsRegEx = /(\/\/.*| ?\/\*[^]*?\*\/)(,?)$/gm
+export const htmlStyleCommentsRegEx =
+  /<!--(?!-?>)(?:[^<-]|<(?!!--(?!>))|-(?!-!>))*?(?<!<!-)-->/gm
+export const razorStyleCommentsRegEx = /@\*[\s\S]*?\*@/gm
+
 export const newLineRegEx = /\r?\n|\r/g
 export const tachyonClassRegEx = /\.([a-zA-Z0-9_-]+)\s*\{([^}]*)\}/g // Regex match: ".[tachyonClassName] { [tachyonClassDefinition] }"
 
@@ -24,7 +27,7 @@ function replaceCommentSymbols(
 }
 
 export function encodeStringSymbolsInComments(text: string) {
-  text = text.replace(singleLineCommentsRegEx, (match) => {
+  text = text.replace(cStyleCommentsRegEx, (match) => {
     const newString = replaceCommentSymbols(
       match,
       decodedStringSymbols,
@@ -33,7 +36,7 @@ export function encodeStringSymbolsInComments(text: string) {
     return newString
   })
 
-  text = text.replace(multiLineCommentsRegEx, (match) => {
+  text = text.replace(htmlStyleCommentsRegEx, (match) => {
     const newString = replaceCommentSymbols(
       match,
       decodedStringSymbols,
@@ -41,11 +44,21 @@ export function encodeStringSymbolsInComments(text: string) {
     )
     return newString
   })
+
+  text = text.replace(razorStyleCommentsRegEx, (match) => {
+    const newString = replaceCommentSymbols(
+      match,
+      decodedStringSymbols,
+      encodedStringSymbols,
+    )
+    return newString
+  })
+
   return text
 }
 
 export function decodeStringSymbolsInComments(text: string) {
-  text = text.replace(singleLineCommentsRegEx, (match) => {
+  text = text.replace(cStyleCommentsRegEx, (match) => {
     const newString = replaceCommentSymbols(
       match,
       encodedStringSymbols,
@@ -54,7 +67,7 @@ export function decodeStringSymbolsInComments(text: string) {
     return newString
   })
 
-  text = text.replace(multiLineCommentsRegEx, (match) => {
+  text = text.replace(htmlStyleCommentsRegEx, (match) => {
     const newString = replaceCommentSymbols(
       match,
       encodedStringSymbols,
@@ -62,6 +75,16 @@ export function decodeStringSymbolsInComments(text: string) {
     )
     return newString
   })
+
+  text = text.replace(razorStyleCommentsRegEx, (match) => {
+    const newString = replaceCommentSymbols(
+      match,
+      encodedStringSymbols,
+      decodedStringSymbols,
+    )
+    return newString
+  })
+
   return text
 }
 
@@ -88,13 +111,13 @@ export function decodeStringSymbolsInComments(text: string) {
 // }
 
 export async function question(question: string) {
-  console.log(`Let's add some numbers!`)
-  console.write(`Count: 0\n> `)
+  console.write(question)
 
-  let count = 0
   for await (const line of console) {
-    count += Number(line)
-    console.write(`Count: ${count}\n> `)
+    const answer = line.toLowerCase()
+    if (line === 'y' || line === 'yes') {
+      return true
+    }
   }
-  return true
+  return false
 }

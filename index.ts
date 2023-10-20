@@ -6,6 +6,7 @@ import {
   parseTachyonCSSFile,
   parseTextForStrings,
   replaceTachyonClasses,
+  testParser,
 } from './src/parse'
 import { question } from './src/strings'
 
@@ -16,7 +17,7 @@ let commands: Record<Command, () => void | Promise<void>> = {
    * Resets the database after prompting the user for confirmation.
    */
   async reset() {
-    const reset = question(
+    const reset = await question(
       'Are you sure you want to reset the database? (y/N)?',
     )
     if (!reset) {
@@ -59,13 +60,10 @@ let commands: Record<Command, () => void | Promise<void>> = {
     await replaceTachyonClasses()
   },
 
-  debug() {
-    console.log(
-      'result',
-      parseTextForStrings(
-        'This is a test string with some duplicate "strings" and `backtick strings` and "strings"',
-      ),
-    )
+  async debug() {
+    const file = Bun.file('test.txt')
+    const text = await file.text()
+    testParser(text)
   },
 }
 
