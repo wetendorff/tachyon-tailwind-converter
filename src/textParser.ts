@@ -61,7 +61,7 @@ export function parseText(input: string): {
         strings.push({
           content: input.substring(startIndex, i + 1),
           start: startIndex,
-          end: i,
+          end: i + 1,
         })
         currentStringChar = ''
       }
@@ -70,10 +70,10 @@ export function parseText(input: string): {
 
       if (commentStyle === 'cstyle' && char === '*' && nextChar === '/') {
         endDetected = true
-        i++ // skip '/'
+        i += 2
       } else if (commentStyle === 'razor' && char === '*' && nextChar === '@') {
         endDetected = true
-        i++ // skip '@'
+        i += 2
       } else if (
         commentStyle === 'html' &&
         i < input.length - 3 &&
@@ -93,7 +93,7 @@ export function parseText(input: string): {
         comments.push({
           content: input.substring(startIndex, i),
           start: startIndex,
-          end: i - 1,
+          end: i,
         })
         commentStyle = ''
       } else if (i === input.length - 1) {
@@ -101,7 +101,7 @@ export function parseText(input: string): {
         comments.push({
           content: input.substring(startIndex, i + 1),
           start: startIndex,
-          end: i,
+          end: i + 1,
         })
       }
     }

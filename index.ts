@@ -1,10 +1,9 @@
 import config from './config'
-import db from './src/database'
 import { backupToFile, restoreFromFile } from './src/backup'
+import db from './src/database'
 import {
   findAllUsedTachyonClasses,
   parseTachyonCSSFile,
-  parseTextForStrings,
   replaceTachyonClasses,
   testParser,
 } from './src/parse'
