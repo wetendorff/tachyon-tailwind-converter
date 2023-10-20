@@ -72,11 +72,6 @@ export function parseStringForTachyonClasses(str: string): string[] {
       tachyonClasses.add(word)
     }
   })
-  console.debug(
-    'Found tachyon classes: ' + Array.from(tachyonClasses),
-    ' in ',
-    str,
-  )
   return Array.from(tachyonClasses)
 }
 
