@@ -29,14 +29,22 @@ export async function findAllUsedTachyonClasses() {
   await traverseDirectory(dir, fileCallback)
 }
 
+/**
+ * Parses the given file for Tachyon classes and marks them as used in the database.
+ * @param file - The path to the file to parse.
+ * @returns A Promise that resolves when the file has been parsed and all Tachyon classes have been marked as used in the database.
+ */
 export async function fileCallback(file: string) {
   let text = await Bun.file(file).text()
 
+  // Find all strings in the file
   const { strings } = parseText(text)
 
+  // Find all tachyon classes in the strings
   const tachyonClasses = new Set<string>()
   strings.forEach((str) => {
-    const result = parseStringForTachyonClasses(str.content)
+    const stringWithoutDelimiter = str.content.slice(str.start + 1, str.end - 1)
+    const result = parseStringForTachyonClasses(stringWithoutDelimiter)
     result.forEach((tachyon) => {
       tachyonClasses.add(tachyon)
     })
@@ -49,6 +57,11 @@ export async function fileCallback(file: string) {
   })
 }
 
+/**
+ * Parses a string and returns an array of Tachyon classes found in the string.
+ * @param str - The string to parse for Tachyon classes.
+ * @returns An array of Tachyon classes found in the string.
+ */
 export function parseStringForTachyonClasses(str: string): string[] {
   const tachyonSet = db.getTachyonClassesAsSet()
   const tachyonClasses: Set<string> = new Set()
@@ -59,11 +72,23 @@ export function parseStringForTachyonClasses(str: string): string[] {
       tachyonClasses.add(word)
     }
   })
+  console.debug(
+    'Found tachyon classes: ' + Array.from(tachyonClasses),
+    ' in ',
+    str,
+  )
   return Array.from(tachyonClasses)
 }
 
+/**
+ * Replaces Tachyon classes in all files containing them.
+ * @returns {Promise<void>}
+ */
 export async function replaceTachyonClasses() {
+  // get a list of files that contain Tachyon classes
   const files = db.getFilesContainingTachyonClasses()
+
+  // for each file, replace the Tachyon classes
   for (const file of files) {
     console.log('file: ' + file)
     let text = await Bun.file(file).text()
@@ -72,25 +97,48 @@ export async function replaceTachyonClasses() {
   }
 }
 
+/**
+ * Replaces Tachyon classes in a given text with their equivalent Tailwind classes.
+ * @param text - The text to replace Tachyon classes in.
+ * @returns The text with Tachyon classes replaced with their equivalent Tailwind classes.
+ */
 export function replaceTachyonClassesInText(text: string) {
   const { strings } = parseText(text)
+
+  // keep track of the last position we saw
   let lastEnd = 0
+
+  // keep track of the result of the replacement
   const result: string[] = []
+
+  // loop through the strings, replacing the classes in each
   strings.forEach((str) => {
+    // push the text from the last position to the start of the string
     result.push(text.slice(lastEnd, str.start))
+
+    // push the string with the classes replaced
     const stringDelimiter = str.content[0]
     const stringWithoutDelimiter = text.slice(str.start + 1, str.end - 1)
     const mappedString = replaceTachyonClassesWithTailwindClassesInString(
       stringWithoutDelimiter,
     )
     result.push(stringDelimiter + mappedString + stringDelimiter)
+
+    // update the last position
     lastEnd = str.end
   })
-  // Append the text after all replacements
+
+  // append the text after all replacements
   result.push(text.slice(lastEnd))
   return result.join('')
 }
 
+/**
+ * Replaces all Tachyon classes in a string with their corresponding Tailwind classes.
+ *
+ * @param str - The string to replace Tachyon classes in.
+ * @returns The string with all Tachyon classes replaced with their corresponding Tailwind classes.
+ */
 export function replaceTachyonClassesWithTailwindClassesInString(
   str: string,
 ): string {
@@ -134,6 +182,6 @@ export function testParser(text: string) {
     console.log(str.end + (str.end >= last ? ' ERROR' : ''))
   }
 
-  // console.log('strings', strings)
-  // console.log('comments', comments)
+  console.log('strings', strings)
+  console.log('comments', comments)
 }
