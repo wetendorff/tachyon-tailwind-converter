@@ -8,6 +8,8 @@ const ignoreDirectories = [
   'bin',
   'wwwroot',
   'Migrations',
+  'js',
+  'Api',
 ]
 const fileExtensions = ['.js', '.jsx', '.ts', '.tsx', '.html', '.cs', '.cshtml']
 const backupFile = 'mapping.json'
