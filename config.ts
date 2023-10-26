@@ -1,17 +1,18 @@
 // Configuration
 const tachyonFile =
   '/Users/lars/Projects/hejdoktor/Web/Hejdoktor.Web/Client/css/tachyons.css'
-const sourceDirectory = '/Users/lars/Projects/hejdoktor/Web/Hejdoktor.Web'
-const ignoreDirectories = [
-  'node_modules',
-  'obj',
-  'bin',
-  'wwwroot',
-  'Migrations',
-  'js',
-  'Api',
+const sourceDirectory = '/Users/lars/Projects/symptom-checker'
+const ignoreDirectories = ['node_modules', 'tests', 'scripts', '.vscode']
+const fileExtensions = [
+  '.js',
+  '.jsx',
+  '.ts',
+  '.tsx',
+  '.html',
+  '.cs',
+  '.cshtml',
+  '.vue',
 ]
-const fileExtensions = ['.js', '.jsx', '.ts', '.tsx', '.html', '.cs', '.cshtml']
 const backupFile = 'mapping.json'
 
 export default {

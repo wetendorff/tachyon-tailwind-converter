@@ -1,162 +1,30 @@
-#nullable disable
+<template>
+  <input
+    type="text"
+    name="answer"
+    v-model="$parent.selectedAnswersText[$parent.selectedAnswersId]"
+    class="input-reset ba b-hd-base bg-hd-base-lightest pa3 mb3 db w-100 br3 bw1"
+    ref="input"
+  />
+</template>
 
-using System.Collections.Generic;
-using Hejdoktor.Web.App_GlobalResources;
+<script lang="ts">
+import { Component, Prop, Vue } from "vue-property-decorator";
 
-namespace Hejdoktor.Web.Helpers
-{
-    public static class IdentityResultErrorMessages
-    {
-        public static List<string> GetResourceEquivalent(IEnumerable<string> errors)
-        {
-            var errorList = new List<string>();
+@Component
+export default class ControlText extends Vue {
+  @Prop() public placeholder?: string;
+  @Prop() public isQuestionRequired?: boolean;
+  @Prop() public title?: string;
 
-            if (errors == null) return errorList;
-
-            foreach (string error in errors)
-            {
-                if (error.StartsWith("An unknown failure has occured."))
-                {
-                    errorList.Add(IdentityErrors.DefaultError);
-                }
-                else if (error.StartsWith("Email '") && error.EndsWith("' is already taken."))
-                {
-                    errorList.Add(string.Format(IdentityErrors.DuplicateEmail, error.Replace("Email '", "").Replace("' is already taken.", "")));
-                }
-                else if (error.StartsWith("Name ") && error.EndsWith(" is already taken."))
-                {
-                    errorList.Add(string.Format(IdentityErrors.DuplicateName, error.Replace("Name ", "").Replace(" is already taken.", "")));
-                }
-                else if (error.StartsWith("A user with that external login already exists."))
-                {
-                    errorList.Add(IdentityErrors.ExternalLoginExists);
-                }
-                else if (error.StartsWith("Email '") && error.EndsWith("' is invalid."))
-                {
-                    errorList.Add(string.Format(IdentityErrors.InvalidEmail, error.Replace("Email '", "").Replace("' is invalid.", "")));
-                }
-                else if (error.StartsWith("Invalid token."))
-                {
-                    errorList.Add(IdentityErrors.InvalidToken);
-                }
-                else if (error.StartsWith("User name ") && error.EndsWith(" is invalid, can only contain letters or digits."))
-                {
-                    errorList.Add(string.Format(IdentityErrors.InvalidUserName, error.Replace("User name ", "").Replace(" is invalid, can only contain letters or digits.", "")));
-                }
-                else if (error.StartsWith("Lockout is not enabled for this user."))
-                {
-                    errorList.Add(IdentityErrors.LockoutNotEnabled);
-                }
-                else if (error.StartsWith("No IUserTokenProvider is registered."))
-                {
-                    errorList.Add(IdentityErrors.NoTokenProvider);
-                }
-                else if (error.StartsWith("No IUserTwoFactorProvider for '") && error.EndsWith("' is registered."))
-                {
-                    errorList.Add(string.Format(IdentityErrors.NoTwoFactorProvider, error.Replace("No IUserTwoFactorProvider for '", "").Replace("' is registered.", "")));
-                }
-                else if (error.StartsWith("Incorrect password."))
-                {
-                    errorList.Add(IdentityErrors.PasswordMismatch);
-                }
-                else if (error.StartsWith("Passwords must have at least one digit ('0'-'9')."))
-                {
-                    errorList.Add(IdentityErrors.PasswordRequireDigit);
-                }
-                else if (error.StartsWith("Passwords must have at least one lowercase ('a'-'z')."))
-                {
-                    errorList.Add(IdentityErrors.PasswordRequireLower);
-                }
-                else if (error.StartsWith("Passwords must have at least one non letter or digit character."))
-                {
-                    errorList.Add(IdentityErrors.PasswordRequireNonLetterOrDigit);
-                }
-                else if (error.StartsWith("Passwords must have at least one uppercase ('A'-'Z')."))
-                {
-                    errorList.Add(IdentityErrors.PasswordRequireUpper);
-                }
-                else if (error.StartsWith("Passwords must be at least ") && error.EndsWith(" characters."))
-                {
-                    errorList.Add(string.Format(IdentityErrors.PasswordTooShort, error.Replace("Passwords must be at least ", "").Replace(" characters.", "")));
-                }
-                else if (error.EndsWith(" cannot be null or empty."))
-                {
-                    errorList.Add(string.Format(IdentityErrors.PropertyTooShort, error.Replace(" cannot be null or empty.", "")));
-                }
-                else if (error.StartsWith("Role ") && error.EndsWith(" does not exist."))
-                {
-                    errorList.Add(string.Format(IdentityErrors.RoleNotFound, error.Replace("Role ", "").Replace(" does not exist.", "")));
-                }
-                else if (error.StartsWith("Store does not implement IQueryableRoleStore"))
-                {
-                    errorList.Add(IdentityErrors.StoreNotIQueryableRoleStore);
-                }
-                else if (error.StartsWith("Store does not implement IQueryableUserStore"))
-                {
-                    errorList.Add(IdentityErrors.StoreNotIQueryableUserStore);
-                }
-                else if (error.StartsWith("Store does not implement IUserClaimStore"))
-                {
-                    errorList.Add(IdentityErrors.StoreNotIUserClaimStore);
-                }
-                else if (error.StartsWith("Store does not implement IUserConfirmationStore"))
-                {
-                    errorList.Add(IdentityErrors.StoreNotIUserConfirmationStore);
-                }
-                else if (error.StartsWith("Store does not implement IUserEmailStore"))
-                {
-                    errorList.Add(IdentityErrors.StoreNotIUserEmailStore);
-                }
-                else if (error.StartsWith("Store does not implement IUserLockoutStore"))
-                {
-                    errorList.Add(IdentityErrors.StoreNotIUserLockoutStore);
-                }
-                else if (error.StartsWith("Store does not implement IUserLoginStore"))
-                {
-                    errorList.Add(IdentityErrors.StoreNotIUserLoginStore);
-                }
-                else if (error.StartsWith("Store does not implement IUserPasswordStore"))
-                {
-                    errorList.Add(IdentityErrors.StoreNotIUserPasswordStore);
-                }
-                else if (error.StartsWith("Store does not implement IUserPhoneNumberStore"))
-                {
-                    errorList.Add(IdentityErrors.StoreNotIUserPhoneNumberStore);
-                }
-                else if (error.StartsWith("Store does not implement IUserRoleStore"))
-                {
-                    errorList.Add(IdentityErrors.StoreNotIUserRoleStore);
-                }
-                else if (error.StartsWith("Store does not implement IUserSecurityStampStore"))
-                {
-                    errorList.Add(IdentityErrors.StoreNotIUserSecurityStampStore);
-                }
-                else if (error.StartsWith("Store does not implement IUserTwoFactorStore"))
-                {
-                    errorList.Add(IdentityErrors.StoreNotIUserTwoFactorStore);
-                }
-                else if (error.StartsWith("User already has a password set."))
-                {
-                    errorList.Add(IdentityErrors.UserAlreadyHasPassword);
-                }
-                else if (error.StartsWith("User already in role."))
-                {
-                    errorList.Add(IdentityErrors.UserAlreadyInRole);
-                }
-                else if (error.StartsWith("UserId not found."))
-                {
-                    errorList.Add(IdentityErrors.UserIdNotFound);
-                }
-                else if (error.StartsWith("User ") && error.EndsWith(" does not exist."))
-                {
-                    errorList.Add(string.Format(IdentityErrors.UserNameNotFound, error.Replace("User ", "").Replace(" does not exist.", "")));
-                }
-                else if (error.StartsWith("User is not in role."))
-                {
-                    errorList.Add(IdentityErrors.UserNotInRole);
-                }
-            }
-            return errorList;
-        }
-    }
+  mounted() {
+    /* eslint-disable */
+    // @ts-ignore
+    this.$parent.selectedAnswersId = [this.$parent.currentNode.answers[0].id];
+    /* eslint-enable */
+    (this.$refs.input as HTMLInputElement).focus();
+  }
 }
+</script>
+
+<style scoped></style>

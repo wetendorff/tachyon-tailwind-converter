@@ -43,7 +43,7 @@ export async function fileCallback(file: string) {
   // Find all tachyon classes in the strings
   const tachyonClasses = new Set<string>()
   strings.forEach((str) => {
-    const stringWithoutDelimiter = str.content.slice(str.start + 1, str.end - 1)
+    const stringWithoutDelimiter = str.content.slice(1, str.content.length - 1)
     const result = parseStringForTachyonClasses(stringWithoutDelimiter)
     result.forEach((tachyon) => {
       tachyonClasses.add(tachyon)
@@ -88,7 +88,7 @@ export async function replaceTachyonClasses() {
     console.log('file: ' + file)
     let text = await Bun.file(file).text()
     text = replaceTachyonClassesInText(text)
-    await Bun.write(file + '.new', text)
+    await Bun.write(file, text)
   }
 }
 

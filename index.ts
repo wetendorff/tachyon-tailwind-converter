@@ -2,10 +2,10 @@ import config from './config'
 import { backupToFile, restoreFromFile } from './src/backup'
 import db from './src/database'
 import {
+  fileCallback,
   findAllUsedTachyonClasses,
   parseTachyonCSSFile,
   replaceTachyonClasses,
-  testParser,
 } from './src/parse'
 import { question } from './src/strings'
 
@@ -66,6 +66,7 @@ const commands: Record<Command, () => void | Promise<void>> = {
   async replace() {
     console.log('Replace Tachyon classes with Tailwind classes')
     const notMapped = db.getNotMappedTailwindClasses()
+
     if (notMapped.length > 0) {
       console.log('Not mapped Tailwind classes:')
       console.log(notMapped)
@@ -76,9 +77,7 @@ const commands: Record<Command, () => void | Promise<void>> = {
   },
 
   async debug() {
-    const file = Bun.file('test.txt')
-    const text = await file.text()
-    testParser(text)
+    await fileCallback('test.txt')
   },
 }
 
