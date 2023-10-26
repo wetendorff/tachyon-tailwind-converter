@@ -177,6 +177,6 @@ dist
 mapping.json
 tt.sqlite
 mapping-backup*.json
-mapping-old.json
+mapping-old*.json
 
 /config-*
